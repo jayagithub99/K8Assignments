@@ -1,0 +1,130 @@
+Assignment1
+What are the differences file-wise?:-
+The kind is differentfor both the files. Also, replica set and replication controller uses different  selector types
+The replication controller supports equality based selectors whereas the replica set supports equality based as well as set based selectors
+in Kuberc.yaml we are using the app name under selector . in Replicaset we have added matchLabels.  It also uses labels to select pods that it should be managing
+
+Run the kubia-replicaset.yaml .
+Identify what commands can be run after "kubectl apply...."
+
+[root@ip-172-31-18-159 04-controllers]# kubectl apply -f kubia-replicaset.yaml 
+replicaset.apps/kubia created
+[root@ip-172-31-18-159 04-controllers]# kubectl get po
+NAME           READY   STATUS              RESTARTS   AGE
+kubia-85czk    0/1     ContainerCreating   0          8s
+kubia-pss2n    1/1     Running             0          8s
+kubia-rnjzt    1/1     Running             0          8s
+nginx-jaya     0/1     ImagePullBackOff    0          2d23h
+nginx-jaya-3   1/1     Running             0          2d23h
+[root@ip-172-31-18-159 04-controllers]# kubectl get po
+NAME           READY   STATUS             RESTARTS   AGE
+kubia-85czk    1/1     Running            0          16s
+kubia-pss2n    1/1     Running            0          16s
+kubia-rnjzt    1/1     Running            0          16s
+nginx-jaya     0/1     ImagePullBackOff   0          2d23h
+nginx-jaya-3   1/1     Running            0          2d23h
+[root@ip-172-31-18-159 04-controllers]# kubectl get rs
+NAME    DESIRED   CURRENT   READY   AGE
+kubia   3         3         3       58m
+
+[root@ip-172-31-18-159 04-controllers]# kubectl describe rs/kubia
+Name:         kubia
+Namespace:    jk
+Selector:     app=kubia
+Labels:       <none>
+Annotations:  Replicas:  3 current / 3 desired
+Pods Status:  3 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=kubia
+  Containers:
+   kubia:
+    Image:        luksa/kubia
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Events:
+  Type    Reason            Age   From                   Message
+  ----    ------            ----  ----                   -------
+  Normal  SuccessfulCreate  59m   replicaset-controller  Created pod: kubia-rnjzt
+  Normal  SuccessfulCreate  59m   replicaset-controller  Created pod: kubia-85czk
+  Normal  SuccessfulCreate  59m   replicaset-controller  Created pod: kubia-pss2n
+  
+  Make a service over these pods (kubia-replicaset) and see if the service picks up the web-service within the pod ("You have hit....." message)
+  
+[root@ip-172-31-18-159 04-controllers]# cd ../05-services/
+[root@ip-172-31-18-159 05-services]# vi kubia-svc.yaml 
+[root@ip-172-31-18-159 05-services]# kubectl apply -f kubia-svc.yaml
+service/kubia2 created
+[root@ip-172-31-18-159 05-services]# kubectl get svc
+NAME     TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
+kubia2   ClusterIP   10.99.10.99   <none>        80/TCP    9s
+[root@ip-172-31-18-159 05-services]# curl 10.99.10.99:80
+You've hit kubia-pss2n
+
+Negative Testing : change the labels of the pod and see if the service is still applied on those pods
+
+
+[root@ip-172-31-18-159 05-services]# kubectl label pods kubia-85czk "app=kubia2" --namespace=jk
+error: 'app' already has a value (kubia), and --overwrite is false
+[root@ip-172-31-18-159 05-services]# kubectl label --overwrite pods kubia-85czk "app=kubia2" --namespace=jk
+pod/kubia-85czk labeled
+[root@ip-172-31-18-159 05-services]# kubectl get svc
+NAME     TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
+kubia2   ClusterIP   10.99.10.99   <none>        80/TCP    66m
+[root@ip-172-31-18-159 05-services]# kubectl describe service kubia2 --namespace=jk
+Name:              kubia2
+Namespace:         jk
+Labels:            <none>
+Annotations:       Selector:  app=kubia
+Type:              ClusterIP
+IP:                10.99.10.99
+Port:              <unset>  80/TCP
+TargetPort:        8080/TCP
+Endpoints:         192.168.182.58:8080,192.168.182.59:8080,192.168.182.8:8080
+Session Affinity:  None
+Events:            <none>
+
+[root@ip-172-31-18-159 05-services]# kubectl describe pods kubia-85czk --namespace=jk
+Name:         kubia-85czk
+Namespace:    jk
+Priority:     0
+Node:         ip-172-31-18-103.ap-southeast-1.compute.internal/172.31.18.103
+Start Time:   Mon, 16 May 2022 09:01:43 +0000
+Labels:       app=kubia2
+Annotations:  <none>
+Status:       Running
+IP:           192.168.182.60
+IPs:
+  IP:  192.168.182.60
+Containers:
+  kubia:
+    Container ID:   docker://4a503fc32626c1de98ff543a6037392c452ead1e2eeb3ee32191bd63f458f3c6
+    Image:          luksa/kubia
+    Image ID:       docker-pullable://luksa/kubia@sha256:3f28e304dc0f63dc30f273a4202096f0fa0d08510bd2ee7e1032ce600616de24
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Mon, 16 May 2022 09:01:52 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wk8bt (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-wk8bt:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wk8bt
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:          <none>
