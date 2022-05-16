@@ -11,14 +11,20 @@ batch-job-every-fifteen-minutes   0,15,30,45 * * * *   False     0        <none>
 
 
 Find out what is the command to "get" the running jobs.
-[root@ip-172-31-18-159 04-controllers]# kubectl get jobs 
-No resources found in jk namespace.
+
+root@ip-172-31-18-159 ec2-user]# kubectl get jobs --watch
+NAME                                         COMPLETIONS   DURATION   AGE
+batch-job-every-fifteen-minutes-1652709600   1/1           2m7s       37m
+batch-job-every-fifteen-minutes-1652710500   1/1           2m7s       22m
+batch-job-every-fifteen-minutes-1652711400   1/1           2m6s       6m59s
 
 Observe and if possible, paste the results from your practicals.
 
-[root@ip-172-31-18-159 04-controllers]# kubectl get jobs --watch
+root@ip-172-31-18-159 ec2-user]# kubectl get jobs --watch
 NAME                                         COMPLETIONS   DURATION   AGE
-batch-job-every-fifteen-minutes-1652700600   1/1           2m7s       12m
+batch-job-every-fifteen-minutes-1652709600   1/1           2m7s       37m
+batch-job-every-fifteen-minutes-1652710500   1/1           2m7s       22m
+batch-job-every-fifteen-minutes-1652711400   1/1           2m6s       6m59s
 
 [root@ip-172-31-18-159 04-controllers]# kubectl get cronjob batch-job-every-fifteen-minutes
 NAME                              SCHEDULE             SUSPEND   ACTIVE   LAST SCHEDULE   AGE
@@ -51,4 +57,24 @@ spec:
             
 What is the change from normal Jobs (jobs v/s cronJobs) - Your observation in one sentence.
 
->>A job creates one or more pods running in parallel , It can be any job like cleaning disk space. You can specify how many pods need to complete in this Job. Cronjob is a tool that runs a job periodically on a given schedule.
+>>A job creates one or more pods running in parallel , It can be any job like creating webserver. You can specify how many pods need to complete in this Job. Cronjob is a tool that runs a job periodically on a given schedule.
+
+Job is only appropriate for pods with RestartPolicy equal to OnFailure or Never. 
+
+
+Deleting Cron Jobs
+
+[root@ip-172-31-18-159 04-controllers]# kubectl delete cronjob batch-job-every-fifteen-minutes
+cronjob.batch "batch-job-every-fifteen-minutes" deleted
+[root@ip-172-31-18-159 04-controllers]# kubectl describe cronjobs/batch-job-every-fifteen-minutes
+Error from server (NotFound): cronjobs.batch "batch-job-every-fifteen-minutes" not found
+
+Pods created with Cronjobs are deleted now
+[root@ip-172-31-18-159 04-controllers]# kubectl get po -o wide
+NAME           READY   STATUS             RESTARTS   AGE     IP               NODE                                               NOMINATED NODE   READINESS GATES
+kubia-85czk    1/1     Running            0          6h3m    192.168.182.60   ip-172-31-18-103.ap-southeast-1.compute.internal   <none>           <none>
+kubia-pss2n    1/1     Running            0          6h3m    192.168.182.59   ip-172-31-18-103.ap-southeast-1.compute.internal   <none>           <none>
+kubia-rnjzt    1/1     Running            0          6h3m    192.168.182.58   ip-172-31-18-103.ap-southeast-1.compute.internal   <none>           <none>
+kubia-s2wbj    1/1     Running            0          3h55m   192.168.182.8    ip-172-31-18-103.ap-southeast-1.compute.internal   <none>           <none>
+nginx-jaya     0/1     ImagePullBackOff   0          3d5h    192.168.182.10   ip-172-31-18-103.ap-southeast-1.compute.internal   <none>           <none>
+nginx-jaya-3   1/1     Running            0          3d5h    192.168.182.13   ip-172-31-18-103.ap-southeast-1.compute.internal   <none>           <none>
