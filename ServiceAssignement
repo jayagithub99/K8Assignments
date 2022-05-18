@@ -1,0 +1,6 @@
+Steps for troubleshooting :
+1) First check the service type nodeport is having the nodeport provided
+2) The hostip provided should be a routable ip .
+3) Check the reverse routes on the host 
+4) Try traceroute to see where its failing .
+5)Check if there are any ip-tables on the host defined which are dropping the packets
