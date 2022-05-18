@@ -1,0 +1,4 @@
+Below are some of the usecases where I will opt daemon sets instead of replica sets .
+>>A database cluster storage daemon on every node
+>>A FCAPS/ Fault management systems where it runs log collector daemon and we need that daemon on every node
+>>A Helath monitoring node which need to be exixsted on every node
