@@ -1,0 +1,68 @@
+Below 5 steps are required.
+
+1) Add the following declaration to the deployment yaml file under the spec category:
+
+minReadySeconds: 5
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 1
+   
+  2)  To set up Readiness Probes, add the following lines to the spec.template.spec category in the deployment file: 
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8080
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    successThreshold: 1
+    
+ 3)  New Yaml should like below with adding #1 and #2 and with replicas as 2 which will create 2 replicas so that zero down time can be achived when 1 goes for an update 
+ 
+ piVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  selector:
+
+    matchLabels:
+      app: nginx
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.0
+
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            
+       4) Now apply the yaml file 
+       #kubectl apply -f nginx-jaya.yaml
+       
+       5) modify the image version in the spec.templates.spec.containers section of the yaml file. Then, use kubectl replace to perform the update:
+
+       #kubectl replace -f nginx-test.yaml
+       
+    
