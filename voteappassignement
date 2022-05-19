@@ -37,14 +37,14 @@ tcp        0      0 0.0.0.0:31001           0.0.0.0:*               LISTEN      
 tcp        0      0 0.0.0.0:31000           0.0.0.0:*               LISTEN      5887/kube-proxy  
 
 
-
+Questions :- 
 8. Now try to delete the Pods one by one (first voting Pod, then worker pod, then db pod) and see what happens to the voting and result app after deleting.
 9 Write your observations in a text file.
 10. what happens after db pod deletion.
 11. complete the assignment by making the result pod work. (if you delete db pod, results would not be captured.So repeat what we did in the class in order to make the result pod work.).
 12. Write in the text file, what you did in order to make the result pod work.
 
-Observations:-
+Observations and Results:-
 1) After deleting the worker and results app an delete app 
 2) It is observed that result app stopped working as the new DB its not able to connect teh socket
 3) Applications didnt stopped , because the K8s is taking care of recreating pods
