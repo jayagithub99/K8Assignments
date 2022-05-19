@@ -1,5 +1,17 @@
 
 
+Voting app is downloaded from git and executed the voting app related yaml files . Below is the output for the voting app . 
+Below using get svc , I can see the service type Node prot "
+[root@ip-172-31-18-159 ec2-user]# kubectl get svc
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+db           ClusterIP   10.103.227.110   <none>        5432/TCP         16h
+kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP          6d22h
+redis        ClusterIP   10.106.129.236   <none>        6379/TCP         16h
+result       NodePort    10.100.146.248   <none>        5001:31001/TCP   16h
+vote         NodePort    10.102.51.29     <none>        5000:31000/TCP   16h
+
+
+
 [root@ip-172-31-18-159 ec2-user]# kubectl get po
 NAME                      READY   STATUS             RESTARTS   AGE
 db-b54cd94f4-jnww6        1/1     Running            0          16h
@@ -17,7 +29,17 @@ kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP          6d22h
 redis        ClusterIP   10.106.129.236   <none>        6379/TCP         16h
 result       NodePort    10.100.146.248   <none>        5001:31001/TCP   16h
 vote         NodePort    10.102.51.29     <none>        5000:31000/TCP   16h
+
+By using netstat comand we can see the 31000 and 31001 ports listening 
 [root@ip-172-31-18-159 ec2-user]# netstat -anp|grep 31001
 tcp        0      0 0.0.0.0:31001           0.0.0.0:*               LISTEN      5887/kube-proxy     
 [root@ip-172-31-18-159 ec2-user]# netstat -anp|grep 31000
 tcp        0      0 0.0.0.0:31000           0.0.0.0:*               LISTEN      5887/kube-proxy  
+
+
+
+8. Now try to delete the Pods one by one (first voting Pod, then worker pod, then db pod) and see what happens to the voting and result app after deleting.
+9 Write your observations in a text file.
+10. what happens after db pod deletion.
+11. complete the assignment by making the result pod work. (if you delete db pod, results would not be captured.So repeat what we did in the class in order to make the result pod work.).
+12. Write in the text file, what you did in order to make the result pod work.
