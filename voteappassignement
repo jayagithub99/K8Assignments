@@ -43,3 +43,15 @@ tcp        0      0 0.0.0.0:31000           0.0.0.0:*               LISTEN      
 10. what happens after db pod deletion.
 11. complete the assignment by making the result pod work. (if you delete db pod, results would not be captured.So repeat what we did in the class in order to make the result pod work.).
 12. Write in the text file, what you did in order to make the result pod work.
+
+Observations:-
+1) After deleting the worker and results app an delete app 
+2) It is observed that result app stopped working as the new DB its not able to connect teh socket
+3) Applications didnt stopped , because the K8s is taking care of recreating pods
+3)Connection should always be persistent while designing  irrespective if there is new db is spawning. 
+4)Result pod had to be redeleted to make the result app work as the socket connection failed with previous DB
+5) After recreating the result DB . Result app started working 
+6) One more thing is we need to make sure a Persistent Data and that is possible with PV and PVC.
+
+
+
